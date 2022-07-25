@@ -32,38 +32,35 @@
     >
       <div
         id="text-sentiment-container"
-        class="flex-1 flex flex-row justify-center items-center w-full h-full"
+        class="flex-1 flex flex-row justify-center items-start w-full h-full space-x-20"
         data-loading-states
       >
-        <div>
-          <form hx-get="/wordcloud" hx-target="#wordcloud">
-            <textarea
-              name="text_for_analysis"
-              id="text_for_analysis"
-              rows="10"
-              cols="80"
-              placeholder="Input your text here"
-              class="bg-white rounded-md text-gray-dark w-fit p-5"
-              hx-get="/sentiment"
-              hx-trigger="keyup changed delay:500ms"
-              hx-target="#text-sentiment"
-              hx-sync="closest form:abort"
-            ></textarea>
-            <button
-              class="rounded bg-purple-100 p-10"
-              type="submit"
-              id="get-wordcloud"
-            >
-              Get wordcloud
-            </button>
-          </form>
-        </div>
+        <form
+          hx-get="/wordcloud"
+          hx-target="#wordcloud"
+          class="flex flex-col space-y-10 items-center"
+        >
+          <textarea
+            name="text_for_analysis"
+            id="text_for_analysis"
+            rows="10"
+            cols="80"
+            placeholder="Input your text here"
+            class="bg-white rounded-md text-gray-dark w-fit p-5"
+            hx-get="/sentiment"
+            hx-trigger="keyup changed delay:500ms"
+            hx-target="#text-sentiment"
+            hx-sync="closest form:abort"
+          ></textarea>
+          <button
+            class="rounded bg-purple-100 p-5 w-40"
+            type="submit"
+            id="get-wordcloud"
+          >
+            Get wordcloud
+          </button>
+        </form>
         <div id="text-sentiment"></div>
-      </div>
-      <div
-        id="wordcloud-container"
-        class="flex-1 flex flex-row justify-center items-center"
-      >
         <div id="wordcloud"></div>
       </div>
     </div>
