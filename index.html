@@ -5,8 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="#" />
+    <!-- https://tailwindcss.com/docs/ -->
     <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- https://htmx.org/reference/ -->
     <script src="https://unpkg.com/htmx.org@1.8.0" defer></script>
+    <!-- https://hyperscript.org/reference/ -->
+    <script src="https://unpkg.com/hyperscript.org@0.9.7"></script>
     <script
       src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"
       defer
@@ -23,31 +27,45 @@
   </head>
   <body hx-ext="loading-states" class="bg-gray-800">
     <div
-      class="flex flex-col justify-center items-center mt-10 w-full h-full"
+      class="flex flex-col justify-center items-center mt-20 w-full h-full space-y-10"
       id="main-container"
     >
       <div
-        id="individual-sentiment-container"
-        class="flex-1 flex flex-row justify-center items-center"
+        id="text-sentiment-container"
+        class="flex-1 flex flex-row justify-center items-center w-full h-full"
         data-loading-states
       >
         <div>
-          <label class="text-white">Sentence sentiment analysis</label>
-          <input
-            type="text"
-            name="sentence"
-            id="sentence"
-            hx-get="/individual_sentiment"
-            hx-trigger="keyup changed delay:500ms"
-            hx-target="#individual-sentiment"
-            placeholder="Input your sentence here"
-            class="bg-white rounded-md text-gray-dark w-fit"
-          />
+          <form hx-get="/wordcloud" hx-target="#wordcloud">
+            <textarea
+              name="text_for_analysis"
+              id="text_for_analysis"
+              rows="10"
+              cols="80"
+              placeholder="Input your text here"
+              class="bg-white rounded-md text-gray-dark w-fit p-5"
+              hx-get="/sentiment"
+              hx-trigger="keyup changed delay:500ms"
+              hx-target="#text-sentiment"
+              hx-sync="closest form:abort"
+            ></textarea>
+            <button
+              class="rounded bg-purple-100 p-10"
+              type="submit"
+              id="get-wordcloud"
+            >
+              Get wordcloud
+            </button>
+          </form>
         </div>
-        <div id="individual-sentiment"></div>
+        <div id="text-sentiment"></div>
       </div>
-      <div class="flex-1 flex flex-row justify-center items-center"></div>
-      <div class="flex-1 flex flex-row justify-center items-center"></div>
+      <div
+        id="wordcloud-container"
+        class="flex-1 flex flex-row justify-center items-center"
+      >
+        <div id="wordcloud"></div>
+      </div>
     </div>
   </body>
 </html>
