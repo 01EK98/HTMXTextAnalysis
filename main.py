@@ -1,9 +1,9 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 from nltk import tokenize
 from textblob import TextBlob
 from wordcloud import WordCloud, STOPWORDS
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -16,12 +16,21 @@ app.mount("/assets", StaticFiles(directory="./assets"), name="assets")
 templates = Jinja2Templates(directory="./")
 
 
-async def get_sentiment_polarities_per_sentence(text_for_analysis: str) -> List[float]:
+# TODO: This doesn't work!!!
+async def get_sentiment_polarity(text_for_analysis: Optional[str] = Form("")) -> float:
+    return TextBlob(text_for_analysis).sentiment.polarity
+
+
+async def get_sentiment_polarities_per_sentence(
+    text_for_analysis: Optional[str] = Form(""),
+) -> List[float]:
     sentences = tokenize.sent_tokenize(text_for_analysis)
-    return [TextBlob(sentence).sentiment.polarity for sentence in sentences]
+    return [await get_sentiment_polarity(sentence) for sentence in sentences]
 
 
-async def get_wordcloud(text_for_analysis: str) -> WordCloud | Dict[str, str]:
+async def get_wordcloud(
+    text_for_analysis: Optional[str] = Form(""),
+) -> WordCloud | Dict[str, str]:
     try:
         return WordCloud(
             min_font_size=10,
@@ -40,32 +49,42 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/sentiments", response_class=HTMLResponse)
+@app.post("/sentiments", response_class=HTMLResponse)
 async def sentiments(
     hx_request: Request,
     sentiment_polarities_per_sentence: List[float] = Depends(
         get_sentiment_polarities_per_sentence
     ),
+    overall_sentiment_polarity: float = Depends(get_sentiment_polarity),
 ):
-    adjusted_sentiments = [
-        (sentiment_polarity + 1) / 2
+
+    adjusted_sentiments_per_sentence = [
+        100 * (sentiment_polarity + 1) / 2
         for sentiment_polarity in sentiment_polarities_per_sentence
     ]
 
+    adjusted_overall_sentiment_polarity = 100 * (overall_sentiment_polarity + 1) / 2
+
     return templates.TemplateResponse(
-        "fragments/sentiment.html",
+        "partials/sentiments.html",
         {
             "request": hx_request,
-            "sentiments": adjusted_sentiments,
+            "sentiments": adjusted_sentiments_per_sentence,
+            "overall_sentiment": adjusted_overall_sentiment_polarity,
         },
+        headers={"HX-Trigger": "GeneratedSentiments"},  # trigger HTMX custom  event
     )
 
 
-@app.get("/wordcloud", response_class=HTMLResponse)
+@app.post("/wordcloud", response_class=HTMLResponse)
 async def wordcloud(hx_request: Request, wordcloud: WordCloud = Depends(get_wordcloud)):
-    if type(wordcloud) == dict and wordcloud.get("error") is not None:
-        return templates.TemplateResponse(
-            "fragments/wordcloud_error.html",
-            {"request": hx_request, "error": wordcloud["error"]},
+    if type(wordcloud) is WordCloud:
+        return HTMLResponse(
+            wordcloud.to_svg(), headers={"HX-Trigger": "GeneratedWordcloud"}
         )
-    return HTMLResponse(wordcloud.to_svg())
+
+    return templates.TemplateResponse(
+        "partials/wordcloud_error.html",
+        {"request": hx_request, "error": wordcloud["error"]},
+        headers={"HX-Trigger": "WordcloudError"},
+    )

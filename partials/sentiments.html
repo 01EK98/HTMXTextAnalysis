@@ -1,0 +1,38 @@
+{% if sentiments and overall_sentiment %}
+<p class="text-white text-lg text-center">Sentiment per sentence:</p>
+{% for sentiment in sentiments %}
+<div class="mb-1 text-base font-medium dark:text-white">{{sentiment}}%</div>
+{% if sentiment > 0 and sentiment < 25 %}
+<div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+  <div
+    class="bg-red-600 h-2.5 rounded-full dark:bg-red-500"
+    style="width: {{sentiment}}%"
+  ></div>
+</div>
+{% elif sentiment >= 25 and sentiment < 50 %}
+<div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+  <div
+    class="bg-orange-600 h-2.5 rounded-full dark:bg-orange-500"
+    style="width: {{sentiment}}%"
+  ></div>
+</div>
+{% elif sentiment >= 50 and sentiment < 75 %}
+<div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+  <div
+    class="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500"
+    style="width: {{sentiment}}%"
+  ></div>
+</div>
+{% else %}
+  <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+    <div
+      class="bg-green-600 h-2.5 rounded-full dark:bg-green-500"
+      style="width: {{sentiment}}%"
+    ></div>
+  </div>
+{% endif %}
+{% endfor %}
+<p class="color-green">{{adjusted_overall_sentiment_polarity}}</p>
+    {% endif %}
+  </div>
+</div>

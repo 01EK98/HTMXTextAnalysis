@@ -6,15 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="#" />
     <!-- https://tailwindcss.com/docs/ -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.tailwindcss.com/"></script>
     <!-- https://htmx.org/reference/ -->
-    <script src="https://unpkg.com/htmx.org@1.8.0" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.8.0"></script>
     <!-- https://hyperscript.org/reference/ -->
     <script src="https://unpkg.com/hyperscript.org@0.9.7"></script>
-    <script
-      src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"
-      defer
-    ></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
+    <!-- https://flowbite.com/docs/getting-started/quickstart/#include-via-cdn -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/flowbite@1.5.1/dist/flowbite.min.css"
+    />
+    <script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>
     <style>
       * {
         box-sizing: border-box;
@@ -36,7 +39,7 @@
         data-loading-states
       >
         <form
-          hx-get="/wordcloud"
+          hx-post="/wordcloud"
           hx-target="#wordcloud"
           class="flex flex-col space-y-10 items-center"
         >
@@ -46,18 +49,22 @@
             rows="10"
             cols="80"
             placeholder="Input your text here"
-            class="bg-white rounded-md text-gray-dark w-fit p-5"
-            hx-get="/sentiments"
+            class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            hx-post="/sentiments"
             hx-trigger="keyup changed delay:500ms"
             hx-target="#text-sentiment"
             hx-sync="closest form:abort"
           ></textarea>
           <button
-            class="rounded bg-purple-100 p-5 w-40"
             type="submit"
             id="get-wordcloud"
+            class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
           >
-            Get wordcloud
+            <span
+              class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0"
+            >
+              Get wordcloud
+            </span>
           </button>
         </form>
         <div id="text-sentiment"></div>

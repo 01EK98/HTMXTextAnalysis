@@ -1,22 +1,21 @@
 from typing import List
 from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
+import pytest
 from wordcloud import WordCloud
 from main import app, get_sentiment_polarities_per_sentence, get_wordcloud
-
-client = TestClient(app)
-
-# TODO: should make own class of with a dependency overriding mechanism
-# @pytest.fixture
-# def client() -> TestClient:
-#     client = TestClient(app)
-#     yield client
 
 TEXT_FOR_ANALYSIS = """
     Lorem ipsum dolor sit amet consectetur adipisicing elit. 
     Porro quibusdam totam, accusantium omnis natus minima. 
     Illo fuga placeat aliquid consectetur.
 """
+
+
+@pytest.fixture
+def client() -> TestClient:
+    client = TestClient(app)
+    yield client
 
 
 def overridden_polarities() -> List[float]:
@@ -31,47 +30,53 @@ app.dependency_overrides[get_sentiment_polarities_per_sentence] = overridden_pol
 app.dependency_overrides[get_wordcloud] = overridden_wordcloud
 
 
-def test_root_returns_index_template():
+def test_root_returns_index_template(client):
     response = client.get("/")
     soup = BeautifulSoup(response.text, "lxml")
+
+    assert response.status_code == 200
     assert soup.title.text == "Basic Text Analysis"
 
 
-def test_sentiments_returns_correct_html():
-    response = client.get(f"/sentiments?{TEXT_FOR_ANALYSIS}")
+def test_sentiments_returns_correct_html(client):
+    response = client.post("/sentiments", data={"text_for_analysis": TEXT_FOR_ANALYSIS})
     soup = BeautifulSoup(response.text, "lxml")
 
     sentiment_polarities = [
         sentiment.text.strip() for sentiment in soup.select("div > div")
     ]
 
+    assert response.status_code == 200
     assert soup.find("p").text == "Sentiment per sentence:"
     assert sentiment_polarities == ["50.0%", "50.0%", "50.0%"]
 
 
-def test_wordcloud_endpoint_returns_generated_wordcloud():
-    response = client.get(f"/wordcloud?{TEXT_FOR_ANALYSIS}")
+def test_wordcloud_endpoint_returns_generated_wordcloud(client):
+    response = client.post(f"/wordcloud", data={"text_for_analysis": TEXT_FOR_ANALYSIS})
     soup = BeautifulSoup(response.text, "lxml")
 
-    expected_text_in_svg_nodes = sorted(
+    expected_text_in_svg_nodes: List[str] = sorted(
         set(TEXT_FOR_ANALYSIS.replace(".", " ").replace(",", " ").split())
     )
-    actual_text_in_svg_nodes = sorted(
-        [node.text.split()[0] for node in soup.find("svg").find_all("text")]
+    actual_text_in_svg_nodes: List[str] = sorted(
+        [node.text.strip() for node in soup.find("svg").find_all("text")]
     )
 
+    assert response.status_code == 200
     assert expected_text_in_svg_nodes == actual_text_in_svg_nodes
 
 
-def test_wordcloud_endpoint_displays_error_when_no_text_was_provided(mocker):
+def test_wordcloud_endpoint_displays_error_when_no_text_was_provided(client, mocker):
     app.dependency_overrides = {}
     mocker.patch(
         "main.WordCloud.generate",
         side_effect=ValueError("We need at least 1 word to plot a word cloud, got 0."),
     )
-    response = client.get("/wordcloud?text_for_analysis=")
+
+    response = client.post("/wordcloud", data={"text_for_analysis": ""})
     soup = BeautifulSoup(response.text, "lxml")
 
-    error_message = soup.find("p").text
+    expected_error_text = soup.find("p").text
 
-    assert error_message == "We need at least 1 word to plot a word cloud, got 0."
+    assert response.status_code == 200
+    assert "We need at least 1 word to plot a word cloud, got 0." in expected_error_text
