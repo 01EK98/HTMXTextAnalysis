@@ -43,15 +43,18 @@ def test_sentiments_returns_correct_html(client):
     soup = BeautifulSoup(response.text, "lxml")
 
     sentiment_polarities = [
-        sentiment.text.strip() for sentiment in soup.select("div > div")
+        [sentiment.text.strip() for sentiment in list_item.find("div")]
+        for list_item in soup.select_one("ul").find_all("li")
     ]
 
-    overall_sentiment = soup.select_one("overall-sentiment").find("p").text
+    overall_sentiment_progress = (
+        soup.select_one("#overall-sentiment").select_one("div").text.strip()
+    )
 
     assert response.status_code == 200
-    assert sentiment_polarities == ["50.0%", "50.0%", "50.0%"]
+    assert sentiment_polarities == [["50.0%"], ["50.0%"], ["50.0%"]]
     # TODO: add some variety to the test data
-    assert overall_sentiment == "50%"
+    assert overall_sentiment_progress == "50.0%"
 
 
 def test_wordcloud_endpoint_returns_generated_wordcloud(client):
