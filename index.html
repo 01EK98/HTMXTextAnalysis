@@ -39,7 +39,7 @@
         data-loading-states
       >
         <form
-          hx-post="/wordcloud"
+          hx-post="{{ url_for('wordcloud') }}"
           hx-target="#wordcloud"
           class="flex flex-col space-y-10 items-center"
         >
@@ -50,7 +50,7 @@
             cols="80"
             placeholder="Input your text here"
             class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            hx-post="/sentiments"
+            hx-post="{{ url_for('sentiments') }}"
             hx-trigger="keyup changed delay:500ms"
             hx-target="#text-sentiment"
             hx-sync="closest form:abort"

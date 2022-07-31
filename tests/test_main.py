@@ -46,9 +46,12 @@ def test_sentiments_returns_correct_html(client):
         sentiment.text.strip() for sentiment in soup.select("div > div")
     ]
 
+    overall_sentiment = soup.select_one("overall-sentiment").find("p").text
+
     assert response.status_code == 200
-    assert soup.find("p").text == "Sentiment per sentence:"
     assert sentiment_polarities == ["50.0%", "50.0%", "50.0%"]
+    # TODO: add some variety to the test data
+    assert overall_sentiment == "50%"
 
 
 def test_wordcloud_endpoint_returns_generated_wordcloud(client):
@@ -76,7 +79,7 @@ def test_wordcloud_endpoint_displays_error_when_no_text_was_provided(client, moc
     response = client.post("/wordcloud", data={"text_for_analysis": ""})
     soup = BeautifulSoup(response.text, "lxml")
 
-    expected_error_text = soup.find("p").text
+    expected_error_text = soup.select_one("#error-toast-text").text
 
     assert response.status_code == 200
     assert "We need at least 1 word to plot a word cloud, got 0." in expected_error_text

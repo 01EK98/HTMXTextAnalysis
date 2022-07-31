@@ -59,11 +59,13 @@ async def sentiments(
 ):
 
     adjusted_sentiments_per_sentence = [
-        100 * (sentiment_polarity + 1) / 2
+        round(100 * (sentiment_polarity + 1) / 2, 2)
         for sentiment_polarity in sentiment_polarities_per_sentence
     ]
 
-    adjusted_overall_sentiment_polarity = 100 * (overall_sentiment_polarity + 1) / 2
+    adjusted_overall_sentiment_polarity = round(
+        100 * (overall_sentiment_polarity + 1) / 2, 2
+    )
 
     return templates.TemplateResponse(
         "partials/sentiments.html",

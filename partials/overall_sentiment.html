@@ -1,0 +1,11 @@
+{% if overall_sentiment %}
+<div id="#overall-sentiment">
+  <p class="text-white text-lg text-center mt-5 mb-5">Overall sentiment:</p>
+  <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+    <div
+      class="bg-red-600 h-2.5 rounded-full dark:bg-red-500"
+      style="width: {{sentiment}}%"
+    ></div>
+  </div>
+</div>
+{% endif %}
