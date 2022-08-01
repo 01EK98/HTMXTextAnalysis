@@ -1,56 +1,21 @@
 {% if sentiments %}
 <div id="sentiments">
   <p class="text-white text-lg text-center mb-5">Sentiment per sentence:</p>
-
   <ul
     class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
   >
-    {% for sentiment in sentiments %}
-    <li
-      class="py-2 px-4 w-full rounded-t-lg border-b border-gray-200 dark:border-gray-600"
-    >
-      <div class="mb-1 text-base font-medium dark:text-white">
-        {{sentiment}}%
-      </div>
-      {% if sentiment > 0 and sentiment < 25 %}
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-        <div
-          class="bg-red-600 h-2.5 rounded-full dark:bg-red-500"
-          style="width: {{sentiment}}%"
-        ></div>
-      </div>
-      {% elif sentiment >= 25 and sentiment < 50 %}
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-        <div
-          class="bg-orange-600 h-2.5 rounded-full dark:bg-orange-500"
-          style="width: {{sentiment}}%"
-        ></div>
-      </div>
-      {% elif sentiment >= 50 and sentiment < 65 %}
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-        <div
-          class="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500"
-          style="width: {{sentiment}}%"
-        ></div>
-      </div>
-      {% elif sentiment >= 65 and sentiment < 80 %}
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-        <div
-          class="bg-lime-500 h-2.5 rounded-full dark:bg-lime-400"
-          style="width: {{sentiment}}%"
-        ></div>
-      </div>
-      {% else %}
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-        <div
-          class="bg-green-600 h-2.5 rounded-full dark:bg-green-500"
-          style="width: {{sentiment}}%"
-        ></div>
-      </div>
-      {% endif %}
-    </li>
-    {% endfor %}
+    {% for sentiment in sentiments %} {% include
+    "partials/components/sentiment_progress_bar.html" %} {% endfor %}
   </ul>
 </div>
-{% endif %} {% block content %} {% include "partials/overall_sentiment.html" %}
-{% endblock content %}
+{% endif %} {% if overall_sentiment is not none %}
+<div id="overall-sentiment">
+  <p class="text-white text-lg p-5">Overall sentiment:</p>
+  <ul
+    class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+  >
+    {% with sentiment=overall_sentiment %} {% include
+    "partials/components/sentiment_progress_bar.html" %} {% endwith %}
+  </ul>
+</div>
+{% endif %}

@@ -16,7 +16,6 @@ app.mount("/assets", StaticFiles(directory="./assets"), name="assets")
 templates = Jinja2Templates(directory="./")
 
 
-# TODO: This doesn't work!!!
 async def get_sentiment_polarity(text_for_analysis: Optional[str] = Form("")) -> float:
     return TextBlob(text_for_analysis).sentiment.polarity
 
@@ -33,10 +32,10 @@ async def get_wordcloud(
 ) -> WordCloud | Dict[str, str]:
     try:
         return WordCloud(
-            min_font_size=10,
+            min_font_size=14,
             background_color="black",
-            width=300,
-            height=300,
+            width=250,
+            height=250,
             stopwords=set(STOPWORDS),
             font_path="./assets/Oswald-Bold.ttf",
         ).generate(text_for_analysis)
@@ -57,7 +56,6 @@ async def sentiments(
     ),
     overall_sentiment_polarity: float = Depends(get_sentiment_polarity),
 ):
-
     adjusted_sentiments_per_sentence = [
         round(100 * (sentiment_polarity + 1) / 2, 2)
         for sentiment_polarity in sentiment_polarities_per_sentence
@@ -74,7 +72,7 @@ async def sentiments(
             "sentiments": adjusted_sentiments_per_sentence,
             "overall_sentiment": adjusted_overall_sentiment_polarity,
         },
-        headers={"HX-Trigger": "GeneratedSentiments"},  # trigger HTMX custom  event
+        headers={"HX-Trigger": "generatedSentiments"},  # trigger HTMX custom  event
     )
 
 
@@ -82,11 +80,11 @@ async def sentiments(
 async def wordcloud(hx_request: Request, wordcloud: WordCloud = Depends(get_wordcloud)):
     if type(wordcloud) is WordCloud:
         return HTMLResponse(
-            wordcloud.to_svg(), headers={"HX-Trigger": "GeneratedWordcloud"}
+            wordcloud.to_svg(), headers={"HX-Trigger": "generatedWordcloud"}
         )
 
     return templates.TemplateResponse(
         "partials/wordcloud_error.html",
         {"request": hx_request, "error": wordcloud["error"]},
-        headers={"HX-Trigger": "WordcloudError"},
+        headers={"HX-Trigger": "wordcloudError"},
     )
