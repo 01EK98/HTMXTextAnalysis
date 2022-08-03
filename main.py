@@ -32,10 +32,10 @@ async def get_wordcloud(
 ) -> WordCloud | Dict[str, str]:
     try:
         return WordCloud(
-            min_font_size=14,
+            min_font_size=15,
             background_color="black",
-            width=250,
-            height=250,
+            width=350,
+            height=350,
             stopwords=set(STOPWORDS),
             font_path="./assets/Oswald-Bold.ttf",
         ).generate(text_for_analysis)
@@ -80,7 +80,8 @@ async def sentiments(
 async def wordcloud(hx_request: Request, wordcloud: WordCloud = Depends(get_wordcloud)):
     if type(wordcloud) is WordCloud:
         return HTMLResponse(
-            wordcloud.to_svg(), headers={"HX-Trigger": "generatedWordcloud"}
+            wordcloud.to_svg(embed_font=True),
+            headers={"HX-Trigger": "generatedWordcloud"},
         )
 
     return templates.TemplateResponse(

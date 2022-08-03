@@ -1,4 +1,14 @@
-{% if sentiments %}
+{% if overall_sentiment is not none %}
+<div id="overall-sentiment" class="hidden">
+  <p class="text-white text-lg p-5">Overall sentiment:</p>
+  <ul
+    class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+  >
+    {% with sentiment=overall_sentiment %} {% include
+    "partials/components/sentiment_progress_bar.html" %} {% endwith %}
+  </ul>
+</div>
+{% endif %} {% if sentiments %}
 <div id="sentiments">
   <p class="text-white text-lg text-center mb-5">Sentiment per sentence:</p>
   <ul
@@ -6,16 +16,6 @@
   >
     {% for sentiment in sentiments %} {% include
     "partials/components/sentiment_progress_bar.html" %} {% endfor %}
-  </ul>
-</div>
-{% endif %} {% if overall_sentiment is not none %}
-<div id="overall-sentiment">
-  <p class="text-white text-lg p-5">Overall sentiment:</p>
-  <ul
-    class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-  >
-    {% with sentiment=overall_sentiment %} {% include
-    "partials/components/sentiment_progress_bar.html" %} {% endwith %}
   </ul>
 </div>
 {% endif %}
