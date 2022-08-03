@@ -18,12 +18,14 @@ Run the following from terminal:
 source setup.sh
 ```
 
-### Windows / macOS:
+### Windows:
 
 Run the following from terminal:
 
 ```bash
 python -m virtualenv venv
+.\venv\Scripts\activate
+
 pip install -r requirements.txt
 python nltk_resource_setup.py
 ```
@@ -38,6 +40,18 @@ or if you wish to have hot reload (useful when in development)
 
 ```bash
 uvicorn main:app --reload
+```
+
+## Run tests
+
+```bash
+pytest
+```
+
+with coverage:
+
+```bash
+pytest --cov=.
 ```
 
 ### Powered by:

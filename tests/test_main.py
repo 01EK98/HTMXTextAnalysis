@@ -44,7 +44,7 @@ def test_sentiments_returns_correct_html(client):
 
     sentiment_polarities = [
         [sentiment.text.strip() for sentiment in list_item.find("div")]
-        for list_item in soup.select_one("ul").find_all("li")
+        for list_item in soup.select_one("#sentiments ul").find_all("li")
     ]
 
     overall_sentiment_progress = (
