@@ -2,13 +2,12 @@
 
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 
-This app could be really useful when analyzing articles \
-or publications and trying to assess the biases \
-and sentiments contained in them.
+This app could be really useful when analyzing articles or publications \
+and trying to assess the biases and sentiments contained in them.
 
-The app utilizes htmx in order to have reactivity \
-within the app, but not have to use JavaScript to achieve it. \
-Hyperscript is utilized when in need of some DOM manipulation :)
+The app utilizes htmx in order to have reactivity within the app and not \
+depend on JavaScript to achieve it. \
+\_hyperscript is utilized when in need of some DOM manipulation :)
 
 ## Setup
 
