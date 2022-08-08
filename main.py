@@ -1,4 +1,5 @@
-from typing import Dict, List, Optional
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
 from nltk import tokenize
 from textblob import TextBlob
 from wordcloud import WordCloud, STOPWORDS
@@ -20,11 +21,20 @@ async def get_sentiment_polarity(text_for_analysis: Optional[str] = Form("")) ->
     return TextBlob(text_for_analysis).sentiment.polarity
 
 
+@dataclass
+class SentenceSentiment:
+    sentence: str
+    sentiment_polarity: float
+
+
 async def get_sentiment_polarities_per_sentence(
     text_for_analysis: Optional[str] = Form(""),
-) -> List[float]:
+) -> List[SentenceSentiment]:
     sentences = tokenize.sent_tokenize(text_for_analysis)
-    return [await get_sentiment_polarity(sentence) for sentence in sentences]
+    return [
+        SentenceSentiment(sentence, await get_sentiment_polarity(sentence))
+        for sentence in sentences
+    ]
 
 
 async def get_wordcloud(
@@ -51,25 +61,31 @@ async def index(request: Request):
 @app.post("/sentiments", response_class=HTMLResponse)
 async def sentiments(
     hx_request: Request,
-    sentiment_polarities_per_sentence: List[float] = Depends(
+    sentiment_polarities_per_sentence: List[SentenceSentiment] = Depends(
         get_sentiment_polarities_per_sentence
     ),
     overall_sentiment_polarity: float = Depends(get_sentiment_polarity),
 ):
     adjusted_sentiments_per_sentence = [
-        round(100 * (sentiment_polarity + 1) / 2, 2)
-        for sentiment_polarity in sentiment_polarities_per_sentence
+        SentenceSentiment(
+            sentiment_polarity_per_sentence.sentence,
+            round(
+                100 * (sentiment_polarity_per_sentence.sentiment_polarity + 1) / 2, 2
+            ),
+        )
+        for sentiment_polarity_per_sentence in sentiment_polarities_per_sentence
     ]
 
     adjusted_overall_sentiment_polarity = round(
         100 * (overall_sentiment_polarity + 1) / 2, 2
     )
-
+    print(adjusted_sentiments_per_sentence)
+    print(adjusted_overall_sentiment_polarity)
     return templates.TemplateResponse(
         "partials/sentiments.html",
         {
             "request": hx_request,
-            "sentiments": adjusted_sentiments_per_sentence,
+            "sentiments_per_sentence": adjusted_sentiments_per_sentence,
             "overall_sentiment": adjusted_overall_sentiment_polarity,
         },
         headers={"HX-Trigger": "generatedSentiments"},  # trigger HTMX custom  event

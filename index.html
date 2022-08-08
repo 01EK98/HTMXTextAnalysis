@@ -29,54 +29,57 @@
     <title>Basic Text Analysis</title>
   </head>
   <body hx-ext="loading-states" class="bg-gray-800">
-    <div
-      id="text-sentiment-container"
-      class="flex flex-row justify-center items-start space-x-10 h-full mx-20 mt-20"
-      data-loading-states
-      _="on htmx:afterSettle 
+    <div class="content-wrapper w-4/5">
+      <div
+        id="text-sentiment-container"
+        class="flex flex-row justify-center items-start space-x-10 w-full h-full mx-20 mt-20"
+        data-loading-states
+        _="on htmx:afterSettle 
           if #overall-sentiment
             put #overall-sentiment.innerHTML into #overall-sentiment-container
             then remove #overall-sentiment"
-    >
-      <div id="overall-sentiment-container"></div>
-      <form
-        hx-post="{{ url_for('wordcloud') }}"
-        hx-target="#wordcloud"
-        class="flex-2 flex flex-col space-y-10 justify-center items-center"
       >
-        <textarea
-          name="text_for_analysis"
-          id="text_for_analysis"
-          rows="10"
-          cols="80"
-          placeholder="Input your text here"
-          class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          hx-post="{{ url_for('sentiments') }}"
-          hx-trigger="keyup changed delay:500ms"
-          hx-target="#text-sentiment"
-          hx-sync="closest form:abort"
-        ></textarea>
-        <button
-          type="submit"
-          id="get-wordcloud"
-          class="relative flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
-        >
-          <span
-            class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0"
+        <div class="flex-1 flex-col justify-center items-center">
+          <div id="overall-sentiment-container" class="mb-10"></div>
+          <form
+            hx-post="{{ url_for('wordcloud') }}"
+            hx-target="#wordcloud"
+            class="flex-3 flex flex-col space-y-10 justify-center items-center"
           >
-            Get wordcloud
-          </span>
-        </button>
-      </form>
-
-      <div
-        id="text-sentiment"
-        class="flex-1 flex flex-col justify-center items-center"
-      ></div>
-      <div
-        id="wordcloud"
-        class="flex-1 flex flex-col justify-center items-center"
-      ></div>
+            <textarea
+              name="text_for_analysis"
+              id="text_for_analysis"
+              rows="10"
+              cols="80"
+              placeholder="Input your text here"
+              class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              hx-post="{{ url_for('sentiments') }}"
+              hx-trigger="keyup changed delay:500ms"
+              hx-target="#text-sentiment"
+              hx-sync="closest form:abort"
+            ></textarea>
+            <button
+              type="submit"
+              id="get-wordcloud"
+              class="relative flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800"
+            >
+              <span
+                class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0"
+              >
+                Get wordcloud
+              </span>
+            </button>
+          </form>
+        </div>
+        <div
+          id="text-sentiment"
+          class="flex-2 flex flex-col justify-center items-center"
+        ></div>
+        <div
+          id="wordcloud"
+          class="flex-1 flex flex-col justify-center items-center"
+        ></div>
+      </div>
     </div>
   </body>
 </html>

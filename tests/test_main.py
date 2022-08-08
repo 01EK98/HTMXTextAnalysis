@@ -3,7 +3,12 @@ from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 import pytest
 from wordcloud import WordCloud
-from main import app, get_sentiment_polarities_per_sentence, get_wordcloud
+from main import (
+    app,
+    get_sentiment_polarities_per_sentence,
+    get_wordcloud,
+    SentenceSentiment,
+)
 
 TEXT_FOR_ANALYSIS = """
     Lorem ipsum dolor sit amet consectetur adipisicing elit. 
@@ -18,19 +23,27 @@ def client() -> TestClient:
     yield client
 
 
-def overridden_polarities() -> List[float]:
-    return [0.0, 0.0, 0.0]
+def overridden_sentiment_polarities_per_sentence() -> List[float]:
+    return [
+        SentenceSentiment(
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit", 0.0
+        ),
+        SentenceSentiment("Porro quibusdam totam, accusantium omnis natus minima", 0.0),
+        SentenceSentiment("Illo fuga placeat aliquid consectetur", 0.0),
+    ]
 
 
 def overridden_wordcloud() -> WordCloud:
     return WordCloud().generate(TEXT_FOR_ANALYSIS)
 
 
-app.dependency_overrides[get_sentiment_polarities_per_sentence] = overridden_polarities
+app.dependency_overrides[
+    get_sentiment_polarities_per_sentence
+] = overridden_sentiment_polarities_per_sentence
 app.dependency_overrides[get_wordcloud] = overridden_wordcloud
 
 
-def test_root_returns_index_template(client):
+def test_root_returns_index_template(client: TestClient):
     response = client.get("/")
     soup = BeautifulSoup(response.text, "lxml")
 
@@ -38,7 +51,7 @@ def test_root_returns_index_template(client):
     assert soup.title.text == "Basic Text Analysis"
 
 
-def test_sentiments_returns_correct_html(client):
+def test_sentiments_returns_correct_html(client: TestClient):
     response = client.post("/sentiments", data={"text_for_analysis": TEXT_FOR_ANALYSIS})
     soup = BeautifulSoup(response.text, "lxml")
 
@@ -52,12 +65,24 @@ def test_sentiments_returns_correct_html(client):
     )
 
     assert response.status_code == 200
-    assert sentiment_polarities == [["50.0%"], ["50.0%"], ["50.0%"]]
+    assert sentiment_polarities == [
+        SentenceSentiment(
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit",
+            sentiment_polarity="50.0%",
+        ),
+        SentenceSentiment(
+            "Porro quibusdam totam, accusantium omnis natus minima",
+            sentiment_polarity="50.0%",
+        ),
+        SentenceSentiment(
+            "Illo fuga placeat aliquid consectetur", sentiment_polarity="50.0%"
+        ),
+    ]
     # TODO: add some variety to the test data
     assert overall_sentiment_progress == "50.0%"
 
 
-def test_wordcloud_endpoint_returns_generated_wordcloud(client):
+def test_wordcloud_endpoint_returns_generated_wordcloud(client: TestClient):
     response = client.post(f"/wordcloud", data={"text_for_analysis": TEXT_FOR_ANALYSIS})
     soup = BeautifulSoup(response.text, "lxml")
 
@@ -72,7 +97,9 @@ def test_wordcloud_endpoint_returns_generated_wordcloud(client):
     assert expected_text_in_svg_nodes == actual_text_in_svg_nodes
 
 
-def test_wordcloud_endpoint_displays_error_when_no_text_was_provided(client, mocker):
+def test_wordcloud_endpoint_displays_error_when_no_text_was_provided(
+    client: TestClient, mocker
+):
     app.dependency_overrides = {}
     mocker.patch(
         "main.WordCloud.generate",

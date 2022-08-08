@@ -11,21 +11,11 @@ depend on JavaScript to achieve it. \
 
 ## Setup
 
-### Linux:
-
-Run the following from terminal:
-
-```bash
-source setup.sh
-```
-
-### Windows:
-
 Run the following from terminal:
 
 ```bash
 python -m virtualenv venv
-.\venv\Scripts\activate
+.\venv\Scripts\activate # source venv/bin/activate for Linux
 
 pip install -r requirements.txt
 python nltk_resource_setup.py
