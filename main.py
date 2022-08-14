@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from nltk import tokenize
 from textblob import TextBlob
 from wordcloud import WordCloud, STOPWORDS
@@ -79,8 +79,6 @@ async def sentiments(
     adjusted_overall_sentiment_polarity = round(
         100 * (overall_sentiment_polarity + 1) / 2, 2
     )
-    print(adjusted_sentiments_per_sentence)
-    print(adjusted_overall_sentiment_polarity)
     return templates.TemplateResponse(
         "partials/sentiments.html",
         {

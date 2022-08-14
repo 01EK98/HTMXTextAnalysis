@@ -1,45 +1,31 @@
 {% if overall_sentiment is not none %}
 <div id="overall-sentiment" class="hidden">
-  <p class="text-white text-lg p-5">Overall sentiment:</p>
+  <p class="text-white text-lg px-5 py-2">Overall sentiment:</p>
   <ul
-    class="w-48 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+    class="w-48 text-sm text-center mt-1 font-medium text-gray-900 bg-white rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
   >
     {% with sentiment=overall_sentiment %} {% include
     "partials/components/sentiment_progress_bar.html" %} {% endwith %}
   </ul>
 </div>
 {% endif %} {% if sentiments_per_sentence %}
-<div id="sentiments">
+<div id="sentiments" class="overflow-hidden">
   <p class="text-white text-lg text-center mb-5">Sentiment per sentence:</p>
-  <ul class="relative border-l border-gray-200 dark:border-gray-700">
+  <ul
+    class="overflow-y-scroll overflow-x-hidden h-80 relative border-l border-gray-200 dark:border-gray-700"
+  >
     {% for sentiment_per_sentence in sentiments_per_sentence %}
-    <li class="mb-5 ml-5">
-      <span
-        class="flex absolute -left-3 justify-center items-center w-6 h-6 bg-blue-200 rounded-full ring-4 ring-white dark:ring-gray-900 dark:bg-blue-900"
-      >
-        <svg
-          class="w-8 h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-          ></path>
-        </svg>
-      </span>
+    <li class="mb-5">
       <h3
-        class="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white"
+        class="flex items-center mx-1 mb-1 text-lg font-semibold text-gray-900 dark:text-white"
       >
         {% with sentiment=sentiment_per_sentence.sentiment_polarity %} {%
         include "partials/components/sentiment_progress_bar.html" %} {% endwith
         %}
       </h3>
-      <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
+      <p
+        class="mb-4 mx-5 text-base font-normal text-gray-500 dark:text-gray-400"
+      >
         {{sentiment_per_sentence.sentence}}
       </p>
     </li>
