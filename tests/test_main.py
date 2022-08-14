@@ -6,6 +6,7 @@ from wordcloud import WordCloud
 from main import (
     app,
     get_sentiment_polarities_per_sentence,
+    get_sentiment_polarity,
     get_wordcloud,
     SentenceSentiment,
 )
@@ -25,12 +26,19 @@ def client() -> TestClient:
 
 def overridden_sentiment_polarities_per_sentence() -> List[SentenceSentiment]:
     return [
+        # these sentences are very neutral, the sentiments are modified for some variety
         SentenceSentiment(
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit", 0.0
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit", 0.85
         ),
-        SentenceSentiment("Porro quibusdam totam, accusantium omnis natus minima", 0.0),
-        SentenceSentiment("Illo fuga placeat aliquid consectetur", 0.0),
+        SentenceSentiment(
+            "Porro quibusdam totam, accusantium omnis natus minima", -0.2
+        ),
+        SentenceSentiment("Illo fuga placeat aliquid consectetur", 0.4),
     ]
+
+
+def overridden_overall_sentiment_polarity() -> float:
+    return 0.2
 
 
 def overridden_wordcloud() -> WordCloud:
@@ -40,6 +48,7 @@ def overridden_wordcloud() -> WordCloud:
 app.dependency_overrides[
     get_sentiment_polarities_per_sentence
 ] = overridden_sentiment_polarities_per_sentence
+app.dependency_overrides[get_sentiment_polarity] = overridden_overall_sentiment_polarity
 app.dependency_overrides[get_wordcloud] = overridden_wordcloud
 
 
@@ -74,11 +83,12 @@ def test_sentiments_returns_correct_html(client: TestClient):
     overall_sentiment_progress = (
         soup.select_one("#overall-sentiment").select_one("div").text.strip()
     )
+    print(soup.select_one("#overall-sentiment").prettify())
 
     assert response.status_code == 200
     # TODO: add some variety to the test data
-    assert overall_sentiment_progress == "50.0%"
-    assert sentiment_polarity_percentages == ["50.0%", "50.0%", "50.0%"]
+    assert overall_sentiment_progress == "60.0%"
+    assert sentiment_polarity_percentages == ["92.5%", "40.0%", "70.0%"]
     assert sentiment_polarity_sentences == [
         "Lorem ipsum dolor sit amet consectetur adipisicing elit",
         "Porro quibusdam totam, accusantium omnis natus minima",
