@@ -23,7 +23,7 @@ def client() -> TestClient:
     yield client
 
 
-def overridden_sentiment_polarities_per_sentence() -> List[float]:
+def overridden_sentiment_polarities_per_sentence() -> List[SentenceSentiment]:
     return [
         SentenceSentiment(
             "Lorem ipsum dolor sit amet consectetur adipisicing elit", 0.0
@@ -55,9 +55,20 @@ def test_sentiments_returns_correct_html(client: TestClient):
     response = client.post("/sentiments", data={"text_for_analysis": TEXT_FOR_ANALYSIS})
     soup = BeautifulSoup(response.text, "lxml")
 
-    sentiment_polarities = [
-        [sentiment.text.strip() for sentiment in list_item.find("div")]
-        for list_item in soup.select_one("#sentiments ul").find_all("li")
+    sentiment_polarity_percentages = [
+        tag_with_percentage.text.strip()
+        for tag_with_percentage in soup.select_one(
+            # overall sentiment is moved via hyperscript so we omit it here
+            "#sentiments ul"
+        ).find_all("h3")
+    ]
+
+    sentiment_polarity_sentences = [
+        tag_with_sentence.text.strip()
+        for tag_with_sentence in soup.select_one(
+            # overall sentiment is moved via hyperscript so we omit it here
+            "#sentiments ul"
+        ).find_all("p")
     ]
 
     overall_sentiment_progress = (
@@ -65,21 +76,14 @@ def test_sentiments_returns_correct_html(client: TestClient):
     )
 
     assert response.status_code == 200
-    assert sentiment_polarities == [
-        SentenceSentiment(
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit",
-            sentiment_polarity="50.0%",
-        ),
-        SentenceSentiment(
-            "Porro quibusdam totam, accusantium omnis natus minima",
-            sentiment_polarity="50.0%",
-        ),
-        SentenceSentiment(
-            "Illo fuga placeat aliquid consectetur", sentiment_polarity="50.0%"
-        ),
-    ]
     # TODO: add some variety to the test data
     assert overall_sentiment_progress == "50.0%"
+    assert sentiment_polarity_percentages == ["50.0%", "50.0%", "50.0%"]
+    assert sentiment_polarity_sentences == [
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit",
+        "Porro quibusdam totam, accusantium omnis natus minima",
+        "Illo fuga placeat aliquid consectetur",
+    ]
 
 
 def test_wordcloud_endpoint_returns_generated_wordcloud(client: TestClient):
