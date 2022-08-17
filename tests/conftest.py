@@ -1,11 +1,12 @@
-import asyncio
-from typing import List
+from typing import List, Literal, NoReturn
 import pytest
+import requests
 import uvicorn
 
 from multiprocessing import Process
 from wordcloud import WordCloud
 from fastapi.testclient import TestClient
+from tenacity import retry, stop_after_delay, wait_fixed
 from main import app
 
 from main import (
@@ -21,6 +22,9 @@ TEXT_FOR_ANALYSIS = """
     Porro quibusdam totam, accusantium omnis natus minima. 
     Illo fuga placeat aliquid consectetur.
 """
+APP_HOST = "localhost"
+APP_PORT = 5000
+APP_URL = f"http://{APP_HOST}:{APP_PORT}"
 
 
 def overridden_sentiment_polarities_per_sentence() -> List[SentenceSentiment]:
@@ -51,19 +55,29 @@ app.dependency_overrides[get_sentiment_polarity] = overridden_overall_sentiment_
 app.dependency_overrides[get_wordcloud] = overridden_wordcloud
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def client() -> TestClient:
     client = TestClient(app)
     yield client
 
 
-@pytest.fixture(scope="session")
-async def server() -> None:
-    process = Process(
-        target=lambda: uvicorn.run(app, host="127.0.0.1", port=5000), daemon=True
-    )
+def run_uvicorn() -> None:
+    uvicorn.run(app, host=APP_HOST, port=APP_PORT)
+
+
+@retry(stop=stop_after_delay(10), wait=wait_fixed(0.01))
+def is_server_running() -> Literal[True] | NoReturn:
+    if requests.get(APP_URL).ok:
+        return True
+    raise
+
+
+# TODO: try to integrate pylenium with async server
+@pytest.fixture(scope="session", autouse=True)
+def run_server() -> None:
+    process = Process(target=run_uvicorn, daemon=True)
     process.start()
-    # TODO: find a cleaner way to do this
-    await asyncio.sleep(0.2)  # wait for server to start
-    yield
+
+    if is_server_running():
+        yield
     process.kill()
