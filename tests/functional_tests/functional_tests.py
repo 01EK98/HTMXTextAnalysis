@@ -46,3 +46,33 @@ def test_clicking_get_wordcloud_button_renders_wordcloud(
     py.get("button#get-wordcloud").click()
 
     assert py.get("#wordcloud").get("svg").should().be_visible()
+
+
+def test_textarea_content_persists_in_between_reloads_and_reopens(
+    run_server, py: Pylenium
+):
+    py.visit(TEST_APP_URL)
+    text_to_type = "test if persists after refresh"
+
+    py.get("textarea#text_for_analysis").type(text_to_type)
+
+    assert (
+        py.reload()
+        .get("textarea#text_for_analysis")
+        .should(timeout=10)
+        .have_attr("value", value=text_to_type)
+    )
+    assert (
+        py.switch_to.new_tab()
+        .visit(TEST_APP_URL)
+        .get("textarea#text_for_analysis")
+        .should(timeout=10)
+        .have_attr("value", value=text_to_type)
+    )
+    assert (
+        py.switch_to.new_window()
+        .visit(TEST_APP_URL)
+        .get("textarea#text_for_analysis")
+        .should(timeout=10)
+        .have_attr("value", value=text_to_type)
+    )

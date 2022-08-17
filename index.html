@@ -60,9 +60,9 @@
               _="init js return localStorage.getItem('text') end then 
                   if its length > 0
                     js return localStorage.getItem('text') end then put it into my value
-                    trigger keyup /* because this textarea makes a POST request on keyup */
+                    trigger keyup // because this textarea makes a POST request on keyup 
                   end
-                on keyup call localStorage.setItem('text', my value)"
+                on keyup call localStorage.setItem('text', my value)" // Persist text content in the browser 
             ></textarea>
             <div class="flex flex-row items-center gap-x-10">
               <div id="overall-sentiment-container"></div>
