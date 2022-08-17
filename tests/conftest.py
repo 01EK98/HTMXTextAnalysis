@@ -73,7 +73,7 @@ def is_server_running() -> Literal[True] | NoReturn:
 
 
 # TODO: try to integrate pylenium with async server
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture
 def run_server() -> None:
     process = Process(target=run_uvicorn, daemon=True)
     process.start()
