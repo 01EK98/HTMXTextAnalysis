@@ -6,9 +6,8 @@ In a production environment functional tests shouldn't have overridden dependenc
 
 UI tests implemented in this manner (with overridden dependencies) can serve as 
 tests for our frontend/DOM manipulation logic though, because we don't have any 
-unit/integration tests for our HTMX and _hyperscript code.
+unit/integration tests for our htmx and _hyperscript code.
 """
-import pytest
 from pylenium.driver import Pylenium
 
 

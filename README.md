@@ -2,12 +2,12 @@
 
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 
-This app could be really useful when analyzing articles or publications \
-and trying to assess the biases and sentiments contained in them.
+This app could be really useful when analyzing articles or publications and trying to \
+assess the biases and sentiments contained in them.
 
-The app utilizes htmx in order to have reactivity within the app and not \
-depend on JavaScript to achieve it. \
-\_hyperscript is utilized when in need of some DOM manipulation :)
+The app utilizes htmx in order to load HTML partials without refreshing the page
+and not depend on JavaScript to achieve that effect. \
+\_hyperscript is utilized when in need of some DOM manipulation and Web API usage :)
 
 ## Setup
 
@@ -15,7 +15,7 @@ Run the following from terminal:
 
 ```bash
 python -m virtualenv venv
-.\venv\Scripts\activate # source venv/bin/activate for Linux
+.\venv\Scripts\activate # source venv/bin/activate in bash
 
 pip install -r requirements.txt
 python nltk_resource_setup.py
@@ -33,7 +33,7 @@ or if you wish to have hot reload (useful when in development)
 uvicorn main:app --reload
 ```
 
-## Run tests
+## Run unit tests
 
 ```bash
 pytest
@@ -43,6 +43,12 @@ with coverage:
 
 ```bash
 pytest --cov=.
+```
+
+## Run functional tests
+
+```bash
+pytest .\tests\functional_tests\functional_tests.py # pytest tests/functional_tests/* in bash
 ```
 
 ### Powered by:
