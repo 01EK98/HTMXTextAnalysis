@@ -22,15 +22,17 @@
       * {
         box-sizing: border-box;
       }
+
       [data-loading] {
         display: none;
       }
     </style>
     <title>Basic Text Analysis</title>
   </head>
-  <body hx-ext="loading-states" class="bg-gray-800">
+  <body class="bg-gray-800">
+    <p class="p-8 bg-teal-700 text-white">Simple text analysis</p>
     <div
-      class="content-wrapper w-full flex flex-row justify-center items-center"
+      class="content-wrapper w-full h-full flex flex-row justify-center items-center"
     >
       <div
         id="text-sentiment-container"
@@ -46,24 +48,48 @@
             hx-target="#wordcloud"
             class="flex flex-col space-y-10 justify-center items-center"
           >
-            <textarea
-              name="text_for_analysis"
-              id="text_for_analysis"
-              rows="15"
-              cols="80"
-              placeholder="Input your text here"
-              class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              hx-post="{{ url_for('sentiments') }}"
-              hx-trigger="keyup changed delay:500ms"
-              hx-target="#text-sentiment"
-              hx-sync="closest form:abort"
-              _="init js return localStorage.getItem('text') end then 
-                  if its length > 0
-                    js return localStorage.getItem('text') end then put it into my value
-                    trigger keyup // because this textarea makes a POST request on keyup 
-                  end
-                on keyup call localStorage.setItem('text', my value)" // Persist text content in the browser 
-            ></textarea>
+            <div class="flex flex-row items-center">
+              <textarea
+                name="text_for_analysis"
+                id="text_for_analysis"
+                rows="15"
+                cols="80"
+                placeholder="Input your text here"
+                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                hx-post="{{ url_for('sentiments') }}"
+                hx-trigger="keyup changed delay:500ms"
+                hx-target="#text-sentiment"
+                hx-sync="closest form:abort"
+                _="init js return localStorage.getItem('text') end
+                      then set my value to it
+                      if my value is not empty
+                        then trigger keyup on me /* keyup triggers hx-post */
+                      end
+                    on change call localStorage.setItem('text', my value)"
+              >
+              </textarea>
+              <button
+                id="clear-textarea"
+                _="on click 
+                      halt the event /* prevent bubbling and default behavior */
+                        set #text_for_analysis.value to '' then call localStorage.setItem('text', '')"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 fill-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </button>
+            </div>
             <div class="flex flex-row items-center gap-x-10">
               <div id="overall-sentiment-container"></div>
               <button
