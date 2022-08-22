@@ -30,7 +30,7 @@
     <title>Basic Text Analysis</title>
   </head>
   <body class="bg-gray-800">
-    <p class="p-8 bg-teal-700 text-white">Simple text analysis</p>
+    <p class="p-6 bg-teal-700 text-white font-bold">Simple text analysis</p>
     <div
       class="content-wrapper w-full h-full flex flex-row justify-center items-center"
     >
@@ -45,7 +45,7 @@
         <div class="flex-2 flex-col justify-center items-center">
           <form
             hx-post="{{ url_for('wordcloud') }}"
-            hx-target="#wordcloud"
+            hx-target="#generated-wordcloud"
             class="flex flex-col space-y-10 justify-center items-center"
           >
             <div class="flex flex-row items-center">
@@ -108,8 +108,11 @@
         ></div>
         <div
           id="wordcloud"
-          class="flex-1 flex flex-col justify-center items-center"
-        ></div>
+          class="flex-1 flex flex-col justify-start items-center"
+        >
+          <p class="text-white font-bold mb-4 text-xl">☁️Wordcloud</p>
+          <div id="generated-wordcloud"></div>
+        </div>
       </div>
     </div>
   </body>
