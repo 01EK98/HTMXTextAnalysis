@@ -32,11 +32,11 @@
   <body class="bg-gray-800">
     <p class="p-6 bg-teal-700 text-white font-bold">Simple text analysis</p>
     <div
-      class="content-wrapper w-full h-full flex flex-row justify-center items-center"
+      class="content-wrapper w-full flex flex-row justify-center items-center"
     >
       <div
         id="text-sentiment-container"
-        class="flex flex-row justify-center items-start space-x-10 w-full h-full mx-20 mt-20"
+        class="flex flex-row justify-center items-start space-x-10 w-full h-full mx-20 my-16"
         _="on htmx:afterSettle 
           if #overall-sentiment
             put #overall-sentiment.innerHTML into #overall-sentiment-container
@@ -47,32 +47,38 @@
             hx-post="{{ url_for('wordcloud') }}"
             hx-target="#generated-wordcloud"
             class="flex flex-col space-y-10 justify-center items-center"
+            _="on htmx:beforeRequest 
+                remove .hidden from #wordcloud-loading-spinner
+                add .hidden to #generated-wordcloud
+               on htmx:afterOnLoad 
+                add .hidden to #wordcloud-loading-spinner
+                remove .hidden from #generated-wordcloud"
           >
             <div class="flex flex-row items-center">
               <textarea
                 name="text_for_analysis"
                 id="text_for_analysis"
-                rows="15"
-                cols="80"
+                rows="12"
+                cols="60"
                 placeholder="Input your text here"
                 class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 hx-post="{{ url_for('sentiments') }}"
                 hx-trigger="keyup changed delay:500ms"
                 hx-target="#text-sentiment"
                 hx-sync="closest form:abort"
-                _="init js return localStorage.getItem('text') end
+                _="on change call localStorage.setItem('text', my value)
+                   init js return localStorage.getItem('text') end
                       then set my value to it
                       if my value is not empty
                         then trigger keyup on me /* keyup triggers hx-post */
-                      end
-                    on change call localStorage.setItem('text', my value)"
+                      end"
               >
               </textarea>
               <button
                 id="clear-textarea"
                 _="on click 
                       halt the event /* prevent bubbling and default behavior */
-                        set #text_for_analysis.value to '' then call localStorage.setItem('text', '')"
+                      set #text_for_analysis.value to '' then call localStorage.setItem('text', '')"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -90,8 +96,8 @@
                 </svg>
               </button>
             </div>
-            <div class="flex flex-row items-center gap-x-10">
-              <div id="overall-sentiment-container"></div>
+            <div class="flex flex-row items-center">
+              <div id="overall-sentiment-container" class="mr-5"></div>
               <button
                 type="submit"
                 id="get-wordcloud"
@@ -111,6 +117,11 @@
           class="flex-1 flex flex-col justify-start items-center"
         >
           <p class="text-white font-bold mb-4 text-xl">☁️Wordcloud</p>
+          <img
+            id="wordcloud-loading-spinner"
+            src="./assets/ball-triangle.svg"
+            class="h-20 w-20 mt-10 hidden"
+          />
           <div id="generated-wordcloud"></div>
         </div>
       </div>
