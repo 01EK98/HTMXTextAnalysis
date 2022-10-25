@@ -3,9 +3,11 @@
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 
 This app could be really useful when analyzing articles or publications and trying to \
-assess the biases and sentiments contained in them.
+assess the biases and sentiments contained in them. 
 
-The app utilizes htmx in order to load HTML partials without refreshing the page
+I thought I could find some technologies to do all the JavaScripty stuff \
+without all the JavaScript for a challenge :P \
+It utilizes htmx in order to load HTML partials without refreshing the page \
 and not depend on JavaScript to achieve that effect. \
 \_hyperscript is utilized when in need of some DOM manipulation and Web API usage :)
 
